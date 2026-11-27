@@ -75,6 +75,18 @@ def required_semester_gpa(planned, prev_gpa, prev_akts, target):
     needed_point = target * (prev_akts + akts - removed_akts) - prev_gpa * prev_akts + removed_point
     return needed_point / akts
 
+def nearby_grades(required, count=3):
+    ranked = []
+    for grade in PASSING:
+        distance = abs(NOTES[grade] - required)
+        ranked.append((distance, grade))
+    ranked.sort()
+
+    nearest = []
+    for _, grade in ranked[:count]:
+        nearest.append(grade)
+    return nearest
+
 def spread(courses):
     points = []
     for _, _, note, _ in courses:
@@ -86,12 +98,14 @@ def sort_key(scenario):
     return (round(gpa, 2), spread(courses))
 
 def find_scenarios(planned, prev_gpa, prev_akts, target, limit=10):
+    required = required_semester_gpa(planned, prev_gpa, prev_akts, target)
+    grades = nearby_grades(required)
     results = []
-    for grades in product(PASSING, repeat=len(planned)):
+    for combo in product(grades, repeat=len(planned)):
         courses = []
         for i in range(len(planned)):
             name, akts, _, old_note = planned[i]
-            courses.append((name, akts, grades[i], old_note))
+            courses.append((name, akts, combo[i], old_note))
         gpa = total_gpa(courses, prev_gpa, prev_akts)
         if gpa >= target :
             results.append((gpa, courses))
