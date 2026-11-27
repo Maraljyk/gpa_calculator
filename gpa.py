@@ -1,4 +1,4 @@
-from itertools import product 
+from itertools import product
 
 NOTES = {"AA": 4.0, "BA": 3.5, "BB": 3.0, "CB": 2.5,
          "CC": 2.0, "DC": 1.5, "DD": 1.0, "FF": 0.0}
@@ -7,7 +7,7 @@ PASSING = ["AA", "BA", "BB", "CB", "CC", "DC", "DD"]
 
 SCENARIOS = {"Best": "AA", "Average": "CB", "Worst": "DD"}
 
- #       CALCULATION :
+#       CALCULATION :
 
 def totals(courses):
     point = akts = removed_point = removed_akts = 0
@@ -28,29 +28,73 @@ def total_gpa(courses, prev_gpa, prev_akts):
     point, akts, removed_point, removed_akts = totals(courses)
     return (prev_gpa * prev_akts + point - removed_point) / (prev_akts + akts - removed_akts)
 
+#       INPUT HELPERS :
+
+def ask_int(prompt, minimum=1):
+    while True:
+        try:
+            value = int(input(prompt))
+        except ValueError:
+            print("Please Enter an Integer Number")
+            continue
+        if value >= minimum:
+            return value
+        print(f"Please Enter a Number of at least {minimum}")
+
+def ask_float(prompt, minimum=0.0, maximum=4.0):
+    while True:
+        try:
+            value = float(input(prompt))
+        except ValueError:
+            print("Please Enter a Number (e.g 3.25)")
+            continue
+        if minimum <= value <= maximum:
+            return value
+        print(f"Please Enter a Number between {minimum} and {maximum}")
+
+def ask_note(prompt):
+    while True:
+        note = input(prompt).upper()
+        if note in NOTES:
+            return note
+        print("Invalid Grade. Use AA, BA, BB, CB, CC, DC, DD or FF")
+
+def ask_yes_no(prompt):
+    while True:
+        answer = input(prompt).lower()
+        if answer in ("y", "n"):
+            return answer == "y"
+        print("Please Enter y or n")
+
 def get_courses(ask_grade = True):
     courses = []
-    number_of_courses = int(input("Enter the amount of courses: "))
+    number_of_courses = ask_int("Enter the amount of courses: ")
 
     for i in range(number_of_courses):
         name = input("Course name: ")
-        akts = int(input("Course AKTS: "))
-        note = None 
+        akts = ask_int("Course AKTS: ")
+        note = None
         if ask_grade:
-         note = input("Course note (AA, BA...): ").upper()
-        old_note = None 
-        if input("Retake?(y/n): ").lower()=="y":
-            old_note =input("Old note: ").upper()
+            note = ask_note("Course note (AA, BA...): ")
+        old_note = None
+        if ask_yes_no("Retake?(y/n): "):
+            old_note = ask_note("Old note: ")
         courses.append((name, akts, note, old_note))
     return courses
+
+def ask_previous():
+    prev_gpa = ask_float("Enter total GPA of previous semesters: ")
+    prev_akts = ask_int("Enter the total amount of AKTS from previous semesters(failed included): ", minimum=0)
+    return prev_gpa, prev_akts
+
+#       OPTIONS :
 
 def option_average():
     courses = get_courses()
     print(f"Semester GPA: {semester_gpa(courses):.2f}")
 
-    prev_gpa = float(input("Enter total GPA of previous semesters: "))
-    prev_akts = int(input("Enter the total amount of AKTS from previous semesters(failed included): "))
-    print(f"Total GPA:  {total_gpa(courses, prev_gpa, prev_akts):.2f}")                       
+    prev_gpa, prev_akts = ask_previous()
+    print(f"Total GPA:  {total_gpa(courses, prev_gpa, prev_akts):.2f}")
 
 def assign_grade(planned, grade):
     courses = []
@@ -60,8 +104,7 @@ def assign_grade(planned, grade):
 
 def option_estimate():
     planned = get_courses(ask_grade = False)
-    prev_gpa = float(input("Enter total GPA of previous semesters: "))
-    prev_akts = int(input("Enter the total amount of AKTS from previous semesters(failed included): "))
+    prev_gpa, prev_akts = ask_previous()
 
     for label, grade in SCENARIOS.items():
         courses = assign_grade(planned, grade)
@@ -112,12 +155,11 @@ def find_scenarios(planned, prev_gpa, prev_akts, target, limit=10):
 
 def option_target():
     planned = get_courses(ask_grade = False)
-    prev_gpa = float(input("Enter total GPA of previous semesters: "))
-    prev_akts = int(input("Enter the total amount of AKTS from previous semesters(failed included): "))
-    target = float(input("Enter your target GPA: "))
+    prev_gpa, prev_akts = ask_previous()
+    target = ask_float("Enter your target GPA: ")
 
-    if (required_semester_gpa(planned, prev_gpa, prev_akts, target) > 4.0 ):
-        print ("Impossible this semester, even with all AA's.")
+    if required_semester_gpa(planned, prev_gpa, prev_akts, target) > 4.0:
+        print("Impossible this semester, even with all AA's.")
         return
 
     for gpa, courses in find_scenarios(planned, prev_gpa, prev_akts, target):
@@ -126,6 +168,8 @@ def option_target():
             line += f"{name}: {note}  "
         print(line)
 
+#       MENU :
+
 def main():
     while True:
         print("\n === GPA CALCULATOR ===\n")
@@ -133,7 +177,7 @@ def main():
         print("2. Target GPA Scenarios")
         print("3. Best/ average/ worst estimate")
         print("0. Exit\n")
-        choice= input("Choose Option: ")
+        choice = input("Choose Option: ")
 
         if choice == "1":
             option_average()
@@ -148,6 +192,3 @@ def main():
             print("Invalid choice. Try again!")
 
 main()
-
-
-        
