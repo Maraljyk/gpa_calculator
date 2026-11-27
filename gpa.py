@@ -67,8 +67,6 @@ def option_estimate():
         courses = assign_grade(planned, grade)
         print(f"{label} ({grade}): Semester {semester_gpa(courses):.2f} | Total {total_gpa(courses, prev_gpa, prev_akts):.2f}")
 
-#option_estimate() # temporary
-
 def required_semester_gpa(planned, prev_gpa, prev_akts, target):
     courses = assign_grade(planned, "AA")
     _, akts, removed_point, removed_akts = totals(courses)
@@ -107,9 +105,9 @@ def find_scenarios(planned, prev_gpa, prev_akts, target, limit=10):
             name, akts, _, old_note = planned[i]
             courses.append((name, akts, combo[i], old_note))
         gpa = total_gpa(courses, prev_gpa, prev_akts)
-        if gpa >= target :
+        if gpa >= target:
             results.append((gpa, courses))
-    results.sort(key = sort_key)
+    results.sort(key=sort_key)
     return results[:limit]
 
 def option_target():
@@ -128,4 +126,28 @@ def option_target():
             line += f"{name}: {note}  "
         print(line)
 
-option_target() # temp exit
+def main():
+    while True:
+        print("\n === GPA CALCULATOR ===\n")
+        print("1. Calculate GPA")
+        print("2. Target GPA Scenarios")
+        print("3. Best/ average/ worst estimate")
+        print("0. Exit\n")
+        choice= input("Choose Option: ")
+
+        if choice == "1":
+            option_average()
+        elif choice == "2":
+            option_target()
+        elif choice == "3":
+            option_estimate()
+        elif choice == "0":
+            print("GOODBYE!")
+            break
+        else:
+            print("Invalid choice. Try again!")
+
+main()
+
+
+        
