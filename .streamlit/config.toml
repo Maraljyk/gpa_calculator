@@ -1,0 +1,23 @@
+[server]
+runOnSave = true
+
+[theme]
+base = "light"
+primaryColor = "#E75480"
+backgroundColor = "#FFF5F8"
+secondaryBackgroundColor = "#FFE4EC"
+textColor = "#4A2C3A"
+font = "Nunito:https://fonts.googleapis.com/css2?family=Nunito&display=swap"
+baseRadius = "large"
+
+# warning 
+yellowColor = "#d57b05"
+yellowBackgroundColor = "#FFF1E0"
+
+# error 
+redColor = "#d20505"
+redBackgroundColor = "#FCE4EC"
+
+# success 
+greenColor = "#44ad63"
+greenBackgroundColor = "#F3E5F5"
